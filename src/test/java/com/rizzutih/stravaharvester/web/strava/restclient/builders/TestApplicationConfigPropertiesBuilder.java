@@ -3,17 +3,17 @@ package com.rizzutih.stravaharvester.web.strava.restclient.builders;
 import com.rizzutih.stravaharvester.config.ApplicationConfigProperties;
 import com.rizzutih.stravaharvester.config.Endpoints;
 
-public class TestApplicationConfigProperties {
+public class TestApplicationConfigPropertiesBuilder {
 
     private String uri;
 
     private Endpoints endpoints;
 
-    private TestApplicationConfigProperties() {
+    private TestApplicationConfigPropertiesBuilder() {
     }
 
-    public static TestApplicationConfigProperties testApplicationConfigProperties() {
-        return new TestApplicationConfigProperties();
+    public static TestApplicationConfigPropertiesBuilder testApplicationConfigProperties() {
+        return new TestApplicationConfigPropertiesBuilder();
     }
 
     public ApplicationConfigProperties setProperties() {

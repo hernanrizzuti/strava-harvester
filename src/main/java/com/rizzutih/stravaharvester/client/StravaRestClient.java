@@ -1,7 +1,7 @@
-package com.rizzutih.stravaharvester.web.strava.restclient;
+package com.rizzutih.stravaharvester.client;
 
 import com.rizzutih.stravaharvester.config.ApplicationConfigProperties;
-import com.rizzutih.stravaharvester.web.strava.response.ActivitiesResponse;
+import com.rizzutih.stravaharvester.web.response.strava.ActivityResponse;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
@@ -24,11 +24,11 @@ public class StravaRestClient {
         this.configProperties = configProperties;
     }
 
-    public ResponseEntity<List<ActivitiesResponse>> getActivities(final String accessToken,
-                                                                  final long before,
-                                                                  final long after,
-                                                                  final int pageNumber,
-                                                                  final int activitiesPerPage) {
+    public ResponseEntity<List<ActivityResponse>> getActivities(final String accessToken,
+                                                                final long before,
+                                                                final long after,
+                                                                final int pageNumber,
+                                                                final int activitiesPerPage) {
 
         final HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(accessToken);

@@ -1,4 +1,4 @@
-package com.rizzutih.stravaharvester.web.strava.response;
+package com.rizzutih.stravaharvester.web.response.strava;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 

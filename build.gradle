@@ -24,10 +24,16 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation group: 'org.apache.parquet', name: 'parquet-avro', version: '1.13.1'
+	implementation group: 'org.apache.parquet', name: 'parquet-hadoop', version: '1.13.1'
+	implementation group: 'org.apache.hadoop', name: 'hadoop-common', version: '3.3.6'
+	implementation group: 'org.apache.hadoop', name: 'hadoop-mapreduce-client-core', version: '3.3.6'
+
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation group: 'uk.org.fyodor', name: 'fyodor-core', version: '1.0.0'
 }
 
 tasks.named('test') {

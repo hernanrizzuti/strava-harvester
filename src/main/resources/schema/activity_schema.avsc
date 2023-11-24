@@ -1,0 +1,45 @@
+{
+  "type": "record",
+  "name": "activity",
+  "fields": [
+    {
+      "name": "name",
+      "type": "string"
+    },
+    {
+      "name": "distance",
+      "type": "double"
+    },
+    {
+      "name": "total_elevation_gain",
+      "type": "double"
+    },
+    {
+      "name": "sport_type",
+      "type": "string"
+    },
+    {
+      "name": "start_date",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
+    },
+    {
+      "name": "average_speed",
+      "type": "double"
+    },
+    {
+      "name": "max_speed",
+      "type": "double"
+    },
+    {
+      "name": "average_cadence",
+      "type": "double"
+    },
+    {
+      "name": "average_temp",
+      "type": "int"
+    }
+  ]
+}

@@ -1,5 +1,6 @@
 package com.rizzutih.stravaharvester.web.strava.restclient;
 
+import com.rizzutih.stravaharvester.client.StravaRestClient;
 import com.rizzutih.stravaharvester.config.ApplicationConfigProperties;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,7 +17,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.time.ZonedDateTime;
 
-import static com.rizzutih.stravaharvester.web.strava.restclient.builders.TestApplicationConfigProperties.testApplicationConfigProperties;
+import static com.rizzutih.stravaharvester.web.strava.restclient.builders.TestApplicationConfigPropertiesBuilder.testApplicationConfigProperties;
 import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -36,7 +37,7 @@ class StravaRestClientTest {
     private ArgumentCaptor<String> urlCaptor;
 
     @Test
-    void test() {
+    void shouldCallStravaApi() {
         final ApplicationConfigProperties configProperties = testApplicationConfigProperties().setProperties();
         final StravaRestClient client = new StravaRestClient(restTemplate, configProperties);
         final ZonedDateTime now = ZonedDateTime.now();
