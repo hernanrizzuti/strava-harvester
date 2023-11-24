@@ -59,6 +59,7 @@ public class CustomParquetWriter {
 
         for (Activity activity : activities) {
             final GenericData.Record activityRecord = new GenericData.Record(schema);
+            //TODO missing fields here and the schema(See Activity class to see all fields)
             activityRecord.put("name", activity.getName());
             activityRecord.put("distance", activity.getDistance());
             activityRecord.put("total_elevation_gain", activity.getTotalElevationGain());

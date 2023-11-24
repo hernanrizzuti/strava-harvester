@@ -1,38 +1,39 @@
 package com.rizzutih.stravaharvester.web.response.strava;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 public class ActivityResponse {
 
     private String name;
-    private float distance;
+    private double distance;
     @JsonProperty("moving_time")
     private int movingTime;
     @JsonProperty("total_elevation_gain")
-    private float totalElevationGain;
+    private double totalElevationGain;
     @JsonProperty("elev_high")
-    private float elevHigh;
+    private double elevHigh;
     @JsonProperty("elev_low")
-    private float elevLow;
+    private double elevLow;
     @JsonProperty("sport_type")
     private SportType sportType;
     @JsonProperty("workout_type")
-    private int workoutType;
+    private Integer workoutType;
     @JsonProperty("start_date")
     private Instant startDate;
     @JsonProperty("average_speed")
-    private float averageSpeed;
+    private double averageSpeed;
     @JsonProperty("max_speed")
-    private float maxSpeed;
+    private double maxSpeed;
     @JsonProperty("average_cadence")
-    private float averageCadence;
+    private double averageCadence;
     @JsonProperty("average_temp")
     private int averageTemp;
 

@@ -3,12 +3,14 @@ package com.rizzutih.stravaharvester.model;
 import com.rizzutih.stravaharvester.web.response.strava.SportType;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Getter
 @Builder
+@ToString
 public class Activity {
 
     private String name;
@@ -25,7 +27,15 @@ public class Activity {
 
     private Double maxSpeed;
 
-    private Double averageCadence;
+    private Integer averageCadence;
 
     private Integer averageTemp;
+
+    private String movingTime;
+
+    private String pace;
+
+    private String distanceUnit;
+
+    private String elevationUnit;
 }
