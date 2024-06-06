@@ -2,6 +2,7 @@ package com.rizzutih.stravaharvester.factory;
 
 import com.rizzutih.stravaharvester.model.Activity;
 import com.rizzutih.stravaharvester.web.response.strava.ActivityResponse;
+import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -9,11 +10,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Component
 public class ActivityFactory {
 
     public List<Activity> getInstance(List<List<ActivityResponse>> stravaActivities) {
 
-        //TODO: Create an Utility class to separate factory from all conventions
         List<Activity> activities = new ArrayList<>();
         List<ActivityResponse> allStravaActivities = stravaActivities.stream()
                 .flatMap(List::stream)
@@ -40,9 +41,8 @@ public class ActivityFactory {
                     .intValue();
 
             final int movingTimeInSeconds = x.getMovingTime();
-            final String movingTime = getMovingTime(movingTimeInSeconds);
 
-            String pace = getPace(distanceInKM, movingTimeInSeconds);
+            final String movingTime = getMovingTime(movingTimeInSeconds);
 
             final Activity activity = Activity.builder()
                     .name(x.getName())
@@ -55,7 +55,9 @@ public class ActivityFactory {
                     .averageCadence(averageCadence)
                     .averageTemp(x.getAverageTemp())
                     .movingTime(movingTime)
-                    .pace(pace)
+                    .movingTimeInSeconds(x.getMovingTime())
+                    .pace(getPace(distanceInKM, movingTimeInSeconds))
+                    .paceInSeconds(getPaceInSeconds(distanceInKM, movingTimeInSeconds))
                     .distanceUnit("Kilometers")
                     .elevationUnit("Meters")
                     .build();
@@ -68,13 +70,18 @@ public class ActivityFactory {
     }
 
     private String getPace(double distanceInKM, int movingTimeInSeconds) {
-        double paceInSeconds = movingTimeInSeconds / distanceInKM;
+        double paceInSeconds = getPaceInSeconds(distanceInKM, movingTimeInSeconds);
 
         final int minutes = (int) (paceInSeconds % 3600) / 60;
         final int seconds = (int) paceInSeconds % 60;
 
         String pace = String.format("%02d:%02d", minutes, seconds);
         return pace;
+    }
+
+    double getPaceInSeconds(double distanceInKM,
+                            int movingTimeInSeconds) {
+        return movingTimeInSeconds / distanceInKM;
     }
 
     private String getMovingTime(int movingTimeInSec) {

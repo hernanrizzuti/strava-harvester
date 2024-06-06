@@ -28,7 +28,10 @@ class ActivityFactoryTest {
         assertEquals(16.14, actualActivity.getMaxSpeed());
         assertEquals(181, actualActivity.getAverageCadence());
         assertEquals("00:38:18", actualActivity.getMovingTime());
+        assertEquals(activityResponse.getMovingTime(), actualActivity.getMovingTimeInSeconds());
         assertEquals("05:14", actualActivity.getPace());
+        assertEquals(activityResponse.getMovingTime() / (activityResponse.getDistance() / 1000),
+                actualActivity.getPaceInSeconds());
         assertEquals("Kilometers", actualActivity.getDistanceUnit());
         assertEquals("Meters", actualActivity.getElevationUnit());
 

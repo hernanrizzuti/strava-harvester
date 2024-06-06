@@ -1,6 +1,7 @@
 package com.rizzutih.stravaharvester.service;
 
 import com.rizzutih.stravaharvester.client.StravaRestClient;
+import com.rizzutih.stravaharvester.config.ApplicationConfigProperties;
 import com.rizzutih.stravaharvester.exception.StravaActivitiesResponseException;
 import com.rizzutih.stravaharvester.factory.ActivityFactory;
 import com.rizzutih.stravaharvester.model.Activity;
@@ -8,12 +9,15 @@ import com.rizzutih.stravaharvester.web.response.strava.ActivityResponse;
 import com.rizzutih.stravaharvester.writer.CustomParquetWriter;
 import org.apache.hadoop.fs.Path;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
 public class ActivitiesServiceImpl implements ActivitiesService {
 
     private final StravaRestClient stravaRestClient;
@@ -45,7 +49,8 @@ public class ActivitiesServiceImpl implements ActivitiesService {
 
         while (true) {
             pageNumber++;
-            final ResponseEntity<List<ActivityResponse>> response = stravaRestClient.getActivities(accessToken, epochNow, epochYearsAgo, pageNumber, activitiesPerPage);
+            final ResponseEntity<List<ActivityResponse>> response = stravaRestClient.getActivities(accessToken,
+                    epochNow, epochYearsAgo, pageNumber, activitiesPerPage);
             if (response.getStatusCodeValue() != 200) {
                 throw new StravaActivitiesResponseException("Strava response failure.");
             }

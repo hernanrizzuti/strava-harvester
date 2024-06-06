@@ -35,11 +35,35 @@
     },
     {
       "name": "average_cadence",
-      "type": "double"
+      "type": "int"
     },
     {
       "name": "average_temp",
       "type": "int"
+    },
+    {
+      "name": "moving_time",
+      "type": "string"
+    },
+    {
+      "name": "moving_time_in_seconds",
+      "type": "double"
+    },
+    {
+      "name": "pace",
+      "type": "string"
+    },
+    {
+      "name": "pace_in_seconds",
+      "type": "double"
+    },
+    {
+      "name": "distance_unit",
+      "type": "string"
+    },
+    {
+      "name": "elevation_unit",
+      "type": "string"
     }
   ]
 }

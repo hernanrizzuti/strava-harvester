@@ -46,6 +46,12 @@ class CustomParquetWriterTest {
         assertEquals(activity.getMaxSpeed(), actualRecord.get("max_speed"));
         assertEquals(activity.getAverageCadence(), actualRecord.get("average_cadence"));
         assertEquals(activity.getAverageTemp(), actualRecord.get("average_temp"));
+        assertEquals(activity.getMovingTime(), actualRecord.get("moving_time").toString());
+        assertEquals(activity.getMovingTimeInSeconds(), actualRecord.get("moving_time_in_seconds"));
+        assertEquals(activity.getPace(), actualRecord.get("pace").toString());
+        assertEquals(activity.getPaceInSeconds(), actualRecord.get("pace_in_seconds"));
+        assertEquals(activity.getDistanceUnit(), actualRecord.get("distance_unit").toString());
+        assertEquals(activity.getElevationUnit(), actualRecord.get("elevation_unit").toString());
     }
 
     private List<GenericData.Record> readParquet(final InputFile filePath) throws IOException {

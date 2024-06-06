@@ -35,7 +35,11 @@ public class TestActivityBuilder {
 
     private String movingTime = "1h 7m";
 
+    private Double movingTimeInSeconds = doubleVal(closed(10.0, 25.0)).next();;
+
     private String pace = integer(closed(1, 8)).next() + ":" + integer(closed(0, 59)).next();
+
+    private Double paceInSeconds = doubleVal(closed(3.0, 12.0)).next();
 
     private TestActivityBuilder() {
     }
@@ -65,7 +69,9 @@ public class TestActivityBuilder {
                 .averageCadence(averageCadence)
                 .averageTemp(averageTemp)
                 .movingTime(movingTime)
+                .movingTimeInSeconds(movingTimeInSeconds)
                 .pace(pace)
+                .paceInSeconds(paceInSeconds)
                 .distanceUnit("Kilometers")
                 .elevationUnit("Meters")
                 .build();

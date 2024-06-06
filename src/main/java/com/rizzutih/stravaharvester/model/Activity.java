@@ -33,7 +33,11 @@ public class Activity {
 
     private String movingTime;
 
+    private double movingTimeInSeconds;
+
     private String pace;
+
+    private Double paceInSeconds;
 
     private String distanceUnit;
 

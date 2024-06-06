@@ -59,7 +59,6 @@ public class CustomParquetWriter {
 
         for (Activity activity : activities) {
             final GenericData.Record activityRecord = new GenericData.Record(schema);
-            //TODO missing fields here and the schema(See Activity class to see all fields)
             activityRecord.put("name", activity.getName());
             activityRecord.put("distance", activity.getDistance());
             activityRecord.put("total_elevation_gain", activity.getTotalElevationGain());
@@ -69,6 +68,12 @@ public class CustomParquetWriter {
             activityRecord.put("max_speed", activity.getMaxSpeed());
             activityRecord.put("average_cadence", activity.getAverageCadence());
             activityRecord.put("average_temp", activity.getAverageTemp());
+            activityRecord.put("moving_time", activity.getMovingTime());
+            activityRecord.put("moving_time_in_seconds", activity.getMovingTimeInSeconds());
+            activityRecord.put("pace", activity.getPace());
+            activityRecord.put("pace_in_seconds", activity.getPaceInSeconds());
+            activityRecord.put("distance_unit", activity.getDistanceUnit());
+            activityRecord.put("elevation_unit", activity.getElevationUnit());
             pw.write(activityRecord);
         }
     }
