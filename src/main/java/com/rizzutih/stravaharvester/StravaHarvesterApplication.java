@@ -1,41 +1,38 @@
 package com.rizzutih.stravaharvester;
 
-import com.rizzutih.stravaharvester.client.StravaRestClient;
-import com.rizzutih.stravaharvester.config.ApplicationConfigProperties;
-import com.rizzutih.stravaharvester.exception.StravaActivitiesResponseException;
-import com.rizzutih.stravaharvester.factory.ActivityFactory;
+import com.rizzutih.stravaharvester.model.Argument;
+import com.rizzutih.stravaharvester.processor.ArgumentProcessor;
 import com.rizzutih.stravaharvester.service.ActivitiesServiceImpl;
-import com.rizzutih.stravaharvester.writer.CustomParquetWriter;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.web.client.RestTemplate;
-
-import java.io.IOException;
+import picocli.CommandLine;
 
 @SpringBootApplication
-public class StravaHarvesterApplication implements ApplicationRunner {
+public class StravaHarvesterApplication implements CommandLineRunner {
 
-    final StravaRestClient stravaRestClient;
-    final ActivitiesServiceImpl activitiesService;
+    final private ActivitiesServiceImpl activitiesService;
+    final private ArgumentProcessor argumentProcessor;
 
-    public StravaHarvesterApplication(final StravaRestClient stravaRestClient,
-                                      final ActivitiesServiceImpl activitiesService) {
-        this.stravaRestClient = stravaRestClient;
+    public StravaHarvesterApplication(final ActivitiesServiceImpl activitiesService,
+                                      final ArgumentProcessor argumentProcessor) {
         this.activitiesService = activitiesService;
+        this.argumentProcessor = argumentProcessor;
     }
 
     public static void main(String[] args) {
-        SpringApplication application = new SpringApplication(StravaHarvesterApplication.class);
-        application.setAddCommandLineProperties(false);
-        application.run(args);
+        SpringApplication.exit(SpringApplication.run(StravaHarvesterApplication.class, args));
     }
 
+
     @Override
-    public void run(ApplicationArguments args) throws StravaActivitiesResponseException, IOException {
-
-        activitiesService.harvestActivities("", 0, "");
-
+    public void run(String... args) throws Exception {
+        final CommandLine commandLine = new CommandLine(argumentProcessor);
+        final int exitCode = commandLine.execute(args);
+        if (exitCode != 0) {
+            throw new IllegalArgumentException("Failed to parse options");
+        }
+        final Argument argument = commandLine.getExecutionResult();
+        activitiesService.harvestActivities(argument.getAccessToken(), argument.getActivityYears(), argument.getHarvestedDestination());
     }
 }

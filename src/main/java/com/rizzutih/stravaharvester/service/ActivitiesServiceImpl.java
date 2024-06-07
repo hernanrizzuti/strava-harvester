@@ -36,11 +36,11 @@ public class ActivitiesServiceImpl implements ActivitiesService {
 
     @Override
     public void harvestActivities(final String accessToken,
-                                  final int yearsOfActivities,
+                                  final int activityYears,
                                   final String destination) throws StravaActivitiesResponseException, IOException {
 
         final ZonedDateTime now = ZonedDateTime.now();
-        final ZonedDateTime yearsAgo = now.minusYears(yearsOfActivities);
+        final ZonedDateTime yearsAgo = now.minusYears(activityYears);
         int pageNumber = 0;
         final int activitiesPerPage = 156;
         final long epochNow = now.toInstant().getEpochSecond();
