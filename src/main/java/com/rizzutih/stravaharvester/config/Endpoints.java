@@ -8,4 +8,6 @@ import lombok.Setter;
 public class Endpoints {
 
     private String activities;
+
+    private String athlete;
 }

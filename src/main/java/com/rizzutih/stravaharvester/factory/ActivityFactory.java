@@ -1,7 +1,9 @@
 package com.rizzutih.stravaharvester.factory;
 
 import com.rizzutih.stravaharvester.model.Activity;
+import com.rizzutih.stravaharvester.model.Athlete;
 import com.rizzutih.stravaharvester.web.response.strava.ActivityResponse;
+import com.rizzutih.stravaharvester.web.response.strava.AthleteResponse;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -13,7 +15,8 @@ import java.util.stream.Collectors;
 @Component
 public class ActivityFactory {
 
-    public List<Activity> getInstance(List<List<ActivityResponse>> stravaActivities) {
+    public List<Activity> getInstance(final List<List<ActivityResponse>> stravaActivities,
+                                      final AthleteResponse athleteResponse) {
 
         List<Activity> activities = new ArrayList<>();
         List<ActivityResponse> allStravaActivities = stravaActivities.stream()
@@ -45,6 +48,7 @@ public class ActivityFactory {
             final String movingTime = getMovingTime(movingTimeInSeconds);
 
             final Activity activity = Activity.builder()
+                    .athleteStravaId(athleteResponse.getId())
                     .name(x.getName())
                     .distance(distance)
                     .totalElevationGain(x.getTotalElevationGain())

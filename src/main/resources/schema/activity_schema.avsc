@@ -3,6 +3,10 @@
   "name": "activity",
   "fields": [
     {
+      "name": "athlete_strava_id",
+      "type": "long"
+    },
+    {
       "name": "name",
       "type": "string"
     },

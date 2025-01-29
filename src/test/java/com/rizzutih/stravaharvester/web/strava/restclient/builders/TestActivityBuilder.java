@@ -17,6 +17,8 @@ public class TestActivityBuilder {
 
     private String name = string().next();
 
+    private Long athleteStravaId = longVal().next();
+
     private Double distance = doubleVal(closed(1.0, 300.0)).next();
 
     private Double totalElevationGain = doubleVal(closed(10.0, 1000.0)).next();
@@ -59,6 +61,7 @@ public class TestActivityBuilder {
 
     public Activity build() {
         return Activity.builder()
+                .athleteStravaId(athleteStravaId)
                 .name(name)
                 .distance(distance)
                 .totalElevationGain(totalElevationGain)

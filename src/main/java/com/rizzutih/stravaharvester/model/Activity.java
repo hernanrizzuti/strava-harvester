@@ -12,6 +12,8 @@ import java.time.Instant;
 @ToString
 public class Activity {
 
+    private Long athleteStravaId;
+
     private String name;
 
     private Double distance;

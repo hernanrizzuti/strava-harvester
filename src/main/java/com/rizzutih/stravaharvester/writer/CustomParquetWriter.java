@@ -59,6 +59,7 @@ public class CustomParquetWriter {
 
         for (Activity activity : activities) {
             final GenericData.Record activityRecord = new GenericData.Record(schema);
+            activityRecord.put("athlete_strava_id", activity.getAthleteStravaId());
             activityRecord.put("name", activity.getName());
             activityRecord.put("distance", activity.getDistance());
             activityRecord.put("total_elevation_gain", activity.getTotalElevationGain());

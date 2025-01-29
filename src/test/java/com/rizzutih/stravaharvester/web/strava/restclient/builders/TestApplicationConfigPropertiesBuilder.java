@@ -20,6 +20,7 @@ public class TestApplicationConfigPropertiesBuilder {
         ApplicationConfigProperties configProperties = new ApplicationConfigProperties();
         Endpoints endpoints = new Endpoints();
         endpoints.setActivities("athlete/activities");
+        endpoints.setAthlete("athlete");
         configProperties.setEndpoints(endpoints);
         configProperties.setUri("https://www.strava.com/api/v3/");
         return configProperties;

@@ -2,6 +2,8 @@ package com.rizzutih.stravaharvester.web.strava.restclient;
 
 import com.rizzutih.stravaharvester.client.StravaRestClient;
 import com.rizzutih.stravaharvester.config.ApplicationConfigProperties;
+import com.rizzutih.stravaharvester.web.response.strava.AthleteResponse;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -36,10 +38,18 @@ class StravaRestClientTest {
     @Captor
     private ArgumentCaptor<String> urlCaptor;
 
+    private ApplicationConfigProperties configProperties;
+
+    private StravaRestClient client;
+
+    @BeforeEach
+    void setUp(){
+        configProperties = testApplicationConfigProperties().setProperties();
+        client = new StravaRestClient(restTemplate, configProperties);
+    }
+
     @Test
-    void shouldCallStravaApi() {
-        final ApplicationConfigProperties configProperties = testApplicationConfigProperties().setProperties();
-        final StravaRestClient client = new StravaRestClient(restTemplate, configProperties);
+    void shouldCallActivityApi() {
         final ZonedDateTime now = ZonedDateTime.now();
         final ZonedDateTime eightYearsAgo = now.minusYears(8);
         final int pageNumber = 1;
@@ -56,5 +66,19 @@ class StravaRestClientTest {
         assertEquals(MediaType.APPLICATION_JSON, headers.getAccept().get(0));
         assertEquals(MediaType.APPLICATION_JSON, headers.getContentType());
         assertEquals("Bearer "+ accessToken, headers.get("Authorization").get(0));
+    }
+
+
+    @Test
+    void shouldCallAthleteApi() {
+        final String accessToken = "8762b4b5c5922676c55827fabd21a4c252b7eafa";
+        client.getAthlete(accessToken);
+        verify(restTemplate).exchange(urlCaptor.capture(), eq(HttpMethod.GET),
+                httpEntityCaptor.capture(), eq(AthleteResponse.class));
+        assertEquals(configProperties.getUri() + configProperties.getEndpoints().getAthlete(),
+                urlCaptor.getValue());
+        HttpHeaders headers = httpEntityCaptor.getValue().getHeaders();
+        assertEquals(MediaType.APPLICATION_JSON, headers.getAccept().get(0));
+        assertEquals(MediaType.APPLICATION_JSON, headers.getContentType());
     }
 }

@@ -32,11 +32,12 @@ class CustomParquetWriterTest {
         final Activity activity2 = TestActivityBuilder.testActivityBuilder().build();
         final Activity activity3 = TestActivityBuilder.testActivityBuilder().build();
         final List<Activity> activityList = Arrays.asList(activity, activity2, activity3);
-        Path path = new Path(testFilesDir + "sample.parquet");
+        final Path path = new Path(testFilesDir + "sample.parquet");
         customParquetWriter.write(activityList, "activity_schema.avsc", path);
 
         List<GenericData.Record> actualRecords = readParquet(HadoopInputFile.fromPath(path, new Configuration()));
         GenericData.Record actualRecord = actualRecords.get(0);
+        assertEquals(activity.getAthleteStravaId(), actualRecord.get("athlete_strava_id"));
         assertEquals(activity.getName(), actualRecord.get("name").toString());
         assertEquals(activity.getDistance(), actualRecord.get("distance"));
         assertEquals(activity.getTotalElevationGain(), actualRecord.get("total_elevation_gain"));

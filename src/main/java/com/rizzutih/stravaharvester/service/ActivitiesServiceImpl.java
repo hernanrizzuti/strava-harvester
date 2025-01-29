@@ -1,15 +1,14 @@
 package com.rizzutih.stravaharvester.service;
 
 import com.rizzutih.stravaharvester.client.StravaRestClient;
-import com.rizzutih.stravaharvester.config.ApplicationConfigProperties;
-import com.rizzutih.stravaharvester.exception.StravaActivitiesResponseException;
+import com.rizzutih.stravaharvester.exception.StravaResponseException;
 import com.rizzutih.stravaharvester.factory.ActivityFactory;
 import com.rizzutih.stravaharvester.model.Activity;
 import com.rizzutih.stravaharvester.web.response.strava.ActivityResponse;
+import com.rizzutih.stravaharvester.web.response.strava.AthleteResponse;
 import com.rizzutih.stravaharvester.writer.CustomParquetWriter;
 import org.apache.hadoop.fs.Path;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -37,7 +36,13 @@ public class ActivitiesServiceImpl implements ActivitiesService {
     @Override
     public void harvestActivities(final String accessToken,
                                   final int activityYears,
-                                  final String destination) throws StravaActivitiesResponseException, IOException {
+                                  final String destination) throws StravaResponseException, IOException {
+
+        final ResponseEntity<AthleteResponse> athleteResponse = stravaRestClient.getAthlete(accessToken);
+
+        if (athleteResponse.getStatusCodeValue() != 200) {
+            throw new StravaResponseException("Strava athlete response failure.");
+        }
 
         final ZonedDateTime now = ZonedDateTime.now();
         final ZonedDateTime yearsAgo = now.minusYears(activityYears);
@@ -49,19 +54,21 @@ public class ActivitiesServiceImpl implements ActivitiesService {
 
         while (true) {
             pageNumber++;
-            final ResponseEntity<List<ActivityResponse>> response = stravaRestClient.getActivities(accessToken,
+            final ResponseEntity<List<ActivityResponse>> activityResponse = stravaRestClient.getActivities(accessToken,
                     epochNow, epochYearsAgo, pageNumber, activitiesPerPage);
-            if (response.getStatusCodeValue() != 200) {
-                throw new StravaActivitiesResponseException("Strava response failure.");
+
+            if (activityResponse.getStatusCodeValue() != 200) {
+                throw new StravaResponseException("Strava activity response failure.");
             }
 
-            final List<ActivityResponse> stravaActivities = response.getBody();
+            final List<ActivityResponse> stravaActivities = activityResponse.getBody();
             if (stravaActivities.isEmpty()) {
                 break;
             }
             allStravaActivities.add(stravaActivities);
         }
-        final List<Activity> activities = activityFactory.getInstance(allStravaActivities);
+
+        final List<Activity> activities = activityFactory.getInstance(allStravaActivities, athleteResponse.getBody());
 
         customParquetWriter.write(activities, "activity_schema.avsc", new Path(destination));
 

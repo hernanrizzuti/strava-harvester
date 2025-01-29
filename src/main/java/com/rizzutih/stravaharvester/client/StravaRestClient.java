@@ -2,6 +2,7 @@ package com.rizzutih.stravaharvester.client;
 
 import com.rizzutih.stravaharvester.config.ApplicationConfigProperties;
 import com.rizzutih.stravaharvester.web.response.strava.ActivityResponse;
+import com.rizzutih.stravaharvester.web.response.strava.AthleteResponse;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
@@ -30,12 +31,7 @@ public class StravaRestClient {
                                                                 final int pageNumber,
                                                                 final int activitiesPerPage) {
 
-        final HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(accessToken);
-        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        final HttpEntity<String> entity = new HttpEntity<>(headers);
+        final HttpEntity<String> entity = getHeader(accessToken);
         final String endpoint = configProperties.getEndpoints().getActivities();
         final String uri = configProperties.getUri();
 
@@ -46,5 +42,20 @@ public class StravaRestClient {
         });
     }
 
+    public ResponseEntity<AthleteResponse> getAthlete(final String accessToken) {
 
+        final HttpEntity<String> entity = getHeader(accessToken);
+        final String endpoint = configProperties.getEndpoints().getAthlete();
+        final String uri = configProperties.getUri();
+
+        return restTemplate.exchange(uri + endpoint, HttpMethod.GET, entity, AthleteResponse.class);
+    }
+
+    private HttpEntity<String> getHeader(String accessToken) {
+        final HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(accessToken);
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        return new HttpEntity<>(headers);
+    }
 }
