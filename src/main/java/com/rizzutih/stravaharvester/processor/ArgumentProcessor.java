@@ -17,8 +17,8 @@ public class ArgumentProcessor implements Callable<Argument> {
     @Option(required = true, names = "--activityYears")
     private String activityYears;
 
-    @Option(required = true, names = "--harvestedDestination")
-    private String harvestedDestination;
+    @Option(required = true, names = "--harvestedActivityDestination")
+    private String harvestedActivityDestination;
 
 
     @Override
@@ -26,7 +26,7 @@ public class ArgumentProcessor implements Callable<Argument> {
         return Argument.builder()
                 .accessToken(accessToken)
                 .activityYears(Integer.parseInt(activityYears))
-                .harvestedDestination(harvestedDestination)
+                .harvestedActivityDestination(harvestedActivityDestination)
                 .build();
     }
 }

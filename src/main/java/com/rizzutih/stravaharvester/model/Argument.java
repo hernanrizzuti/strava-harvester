@@ -11,5 +11,7 @@ public class Argument {
 
     final private String accessToken;
     final private int activityYears;
-    final private String harvestedDestination;
+    final private String harvestedActivityDestination;
+    final private String harvestedAthleteDestination;
+
 }

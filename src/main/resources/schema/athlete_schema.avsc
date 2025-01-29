@@ -1,0 +1,18 @@
+{
+  "type": "record",
+  "name": "athlete",
+  "fields": [
+    {
+      "name": "strava_id",
+      "type": "long"
+    },
+    {
+      "name": "firstname",
+      "type": "string"
+    },
+    {
+      "name": "lastname",
+      "type": "string"
+    }
+  ]
+}

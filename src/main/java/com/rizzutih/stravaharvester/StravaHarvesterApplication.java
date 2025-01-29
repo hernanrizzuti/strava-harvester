@@ -33,6 +33,7 @@ public class StravaHarvesterApplication implements CommandLineRunner {
             throw new IllegalArgumentException("Failed to parse options");
         }
         final Argument argument = commandLine.getExecutionResult();
-        activitiesService.harvestActivities(argument.getAccessToken(), argument.getActivityYears(), argument.getHarvestedDestination());
+        activitiesService.harvestActivities(argument.getAccessToken(), argument.getActivityYears(),
+                argument.getHarvestedActivityDestination());
     }
 }

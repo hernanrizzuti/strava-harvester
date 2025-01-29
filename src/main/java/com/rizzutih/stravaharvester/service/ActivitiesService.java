@@ -8,5 +8,5 @@ public interface ActivitiesService {
 
     void harvestActivities(final String accessToken,
                            final int yearsOfActivities,
-                           final String destination) throws StravaResponseException, IOException;
+                           final String activityDestination) throws StravaResponseException, IOException;
 }

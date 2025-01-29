@@ -1,10 +1,6 @@
 package com.rizzutih.stravaharvester.web.strava.restclient.builders;
 
-import com.rizzutih.stravaharvester.web.response.strava.ActivityResponse;
 import com.rizzutih.stravaharvester.web.response.strava.AthleteResponse;
-import com.rizzutih.stravaharvester.web.response.strava.SportType;
-
-import java.time.Instant;
 
 import static uk.org.fyodor.generators.RDG.longVal;
 import static uk.org.fyodor.generators.RDG.string;

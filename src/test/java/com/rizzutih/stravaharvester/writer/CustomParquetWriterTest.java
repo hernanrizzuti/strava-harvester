@@ -1,7 +1,7 @@
 package com.rizzutih.stravaharvester.writer;
 
 import com.rizzutih.stravaharvester.model.Activity;
-import com.rizzutih.stravaharvester.web.strava.restclient.builders.TestActivityBuilder;
+import com.rizzutih.stravaharvester.model.Athlete;
 import org.apache.avro.generic.GenericData;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.rizzutih.stravaharvester.web.strava.restclient.builders.TestActivityBuilder.testActivityBuilder;
+import static com.rizzutih.stravaharvester.web.strava.restclient.builders.TestAthleteBuilder.testAthleteBuilder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class CustomParquetWriterTest {
@@ -26,17 +28,32 @@ class CustomParquetWriterTest {
     String testFilesDir = "src/test/resources/test-files/";
 
     @Test
+    void shouldWriteAthlete() throws IOException {
+        final CustomParquetWriter customParquetWriter = new CustomParquetWriter();
+        final Athlete athlete = testAthleteBuilder().build();
+        final Path path = new Path(testFilesDir + "sample.parquet");
+        customParquetWriter.writeAthlete(athlete,"athlete_schema.avsc", path);
+
+        final List<GenericData.Record> actualRecords = readParquet(HadoopInputFile.fromPath(path, new Configuration()));
+        final GenericData.Record actualRecord = actualRecords.get(0);
+
+        assertEquals(athlete.getStravaId(), actualRecord.get("strava_id"));
+        assertEquals(athlete.getFirstname(), actualRecord.get("firstname").toString());
+        assertEquals(athlete.getLastname(), actualRecord.get("lastname").toString());
+    }
+
+    @Test
     void shouldWriteParquet() throws IOException {
         final CustomParquetWriter customParquetWriter = new CustomParquetWriter();
-        final Activity activity = TestActivityBuilder.testActivityBuilder().build();
-        final Activity activity2 = TestActivityBuilder.testActivityBuilder().build();
-        final Activity activity3 = TestActivityBuilder.testActivityBuilder().build();
+        final Activity activity = testActivityBuilder().build();
+        final Activity activity2 = testActivityBuilder().build();
+        final Activity activity3 = testActivityBuilder().build();
         final List<Activity> activityList = Arrays.asList(activity, activity2, activity3);
         final Path path = new Path(testFilesDir + "sample.parquet");
-        customParquetWriter.write(activityList, "activity_schema.avsc", path);
+        customParquetWriter.writeActivity(activityList, "activity_schema.avsc", path);
 
-        List<GenericData.Record> actualRecords = readParquet(HadoopInputFile.fromPath(path, new Configuration()));
-        GenericData.Record actualRecord = actualRecords.get(0);
+        final List<GenericData.Record> actualRecords = readParquet(HadoopInputFile.fromPath(path, new Configuration()));
+        final GenericData.Record actualRecord = actualRecords.get(0);
         assertEquals(activity.getAthleteStravaId(), actualRecord.get("athlete_strava_id"));
         assertEquals(activity.getName(), actualRecord.get("name").toString());
         assertEquals(activity.getDistance(), actualRecord.get("distance"));

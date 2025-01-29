@@ -3,7 +3,9 @@ package com.rizzutih.stravaharvester.service;
 import com.rizzutih.stravaharvester.client.StravaRestClient;
 import com.rizzutih.stravaharvester.exception.StravaResponseException;
 import com.rizzutih.stravaharvester.factory.ActivityFactory;
+import com.rizzutih.stravaharvester.factory.AthleteFactory;
 import com.rizzutih.stravaharvester.model.Activity;
+import com.rizzutih.stravaharvester.model.Athlete;
 import com.rizzutih.stravaharvester.web.response.strava.ActivityResponse;
 import com.rizzutih.stravaharvester.web.response.strava.AthleteResponse;
 import com.rizzutih.stravaharvester.writer.CustomParquetWriter;
@@ -25,21 +27,27 @@ public class ActivitiesServiceImpl implements ActivitiesService {
 
     private final ActivityFactory activityFactory;
 
+    private final AthleteFactory athleteFactory;
+
     public ActivitiesServiceImpl(final StravaRestClient stravaRestClient,
                                  final CustomParquetWriter customParquetWriter,
-                                 final ActivityFactory activityFactory) {
+                                 final ActivityFactory activityFactory,
+                                 final AthleteFactory athleteFactory) {
+
         this.stravaRestClient = stravaRestClient;
         this.customParquetWriter = customParquetWriter;
         this.activityFactory = activityFactory;
+        this.athleteFactory = athleteFactory;
     }
 
     @Override
     public void harvestActivities(final String accessToken,
                                   final int activityYears,
-                                  final String destination) throws StravaResponseException, IOException {
+                                  final String activityDestination) throws StravaResponseException, IOException {
 
-        final ResponseEntity<AthleteResponse> athleteResponse = stravaRestClient.getAthlete(accessToken);
+        final ResponseEntity<AthleteResponse> athleteResponse = stravaRestClient.getAthlete(accessToken);//TODO: put this in a separated service
 
+        //TODO: put this in a separated service
         if (athleteResponse.getStatusCodeValue() != 200) {
             throw new StravaResponseException("Strava athlete response failure.");
         }
@@ -68,9 +76,10 @@ public class ActivitiesServiceImpl implements ActivitiesService {
             allStravaActivities.add(stravaActivities);
         }
 
-        final List<Activity> activities = activityFactory.getInstance(allStravaActivities, athleteResponse.getBody());
-
-        customParquetWriter.write(activities, "activity_schema.avsc", new Path(destination));
-
+        final AthleteResponse athleteResponseBody = athleteResponse.getBody();
+        final List<Activity> activities = activityFactory.getInstance(allStravaActivities, athleteResponseBody);
+        final Athlete athlete = athleteFactory.getInstance(athleteResponseBody);//TODO: put this in a separated service
+        customParquetWriter.writeAthlete(athlete, "athlete_schema.avsc", new Path("/Users/hernanrizzuti/Downloads/athlete.parquet"));//TODO: put this in a separated service
+        customParquetWriter.writeActivity(activities, "activity_schema.avsc", new Path(activityDestination));
     }
 }

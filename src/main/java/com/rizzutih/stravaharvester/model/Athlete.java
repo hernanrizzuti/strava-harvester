@@ -10,7 +10,9 @@ import lombok.ToString;
 public class Athlete {
 
     private long stravaId;
+
     private String firstname;
+
     private String lastname;
 
 }

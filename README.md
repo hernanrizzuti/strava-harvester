@@ -13,7 +13,7 @@ Fetches user activities from Strava and writes them into a parquet file.
 ##### Run: add the following tasks and arguments
     clean bootRun --args='
     --accessToken=<strava access token> 
-    --harvestedDestination=<destination where the parquet will be written> 
+    --harvestedActivityDestination=<destination where the parquet will be written> 
     --activityYears=<number of years of activities>'
 
 Example:
