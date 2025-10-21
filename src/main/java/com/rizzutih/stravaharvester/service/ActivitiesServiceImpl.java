@@ -5,9 +5,11 @@ import com.rizzutih.stravaharvester.exception.StravaResponseException;
 import com.rizzutih.stravaharvester.factory.ActivityFactory;
 import com.rizzutih.stravaharvester.factory.AthleteFactory;
 import com.rizzutih.stravaharvester.model.Activity;
+import com.rizzutih.stravaharvester.model.Argument;
 import com.rizzutih.stravaharvester.model.Athlete;
 import com.rizzutih.stravaharvester.web.response.strava.ActivityResponse;
 import com.rizzutih.stravaharvester.web.response.strava.AthleteResponse;
+import com.rizzutih.stravaharvester.web.response.strava.SportType;
 import com.rizzutih.stravaharvester.writer.CustomParquetWriter;
 import org.apache.hadoop.fs.Path;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,8 @@ import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import static java.util.Objects.nonNull;
 
 @Service
 public class ActivitiesServiceImpl implements ActivitiesService {
@@ -41,45 +45,52 @@ public class ActivitiesServiceImpl implements ActivitiesService {
     }
 
     @Override
-    public void harvestActivities(final String accessToken,
-                                  final int activityYears,
-                                  final String activityDestination) throws StravaResponseException, IOException {
+    public void harvestActivities(final Argument argument) throws StravaResponseException, IOException {
 
+        final String accessToken = argument.getAccessToken();
+        final String activityDestination = argument.getHarvestedActivityDestination();
         final ResponseEntity<AthleteResponse> athleteResponse = stravaRestClient.getAthlete(accessToken);//TODO: put this in a separated service
 
         //TODO: put this in a separated service
-        if (athleteResponse.getStatusCodeValue() != 200) {
+        if (athleteResponse.getStatusCode().value() != 200) {
             throw new StravaResponseException("Strava athlete response failure.");
         }
 
         final ZonedDateTime now = ZonedDateTime.now();
-        final ZonedDateTime yearsAgo = now.minusYears(activityYears);
+        final ZonedDateTime yearsAgo = now.minusYears(argument.getActivityYears());
         int pageNumber = 0;
         final int activitiesPerPage = 156;
         final long epochNow = now.toInstant().getEpochSecond();
         final long epochYearsAgo = yearsAgo.toInstant().getEpochSecond();
-        List<List<ActivityResponse>> allStravaActivities = new ArrayList<>();
+        final List<List<ActivityResponse>> allStravaActivities = new ArrayList<>();
 
         while (true) {
             pageNumber++;
             final ResponseEntity<List<ActivityResponse>> activityResponse = stravaRestClient.getActivities(accessToken,
                     epochNow, epochYearsAgo, pageNumber, activitiesPerPage);
 
-            if (activityResponse.getStatusCodeValue() != 200) {
+            if (activityResponse.getStatusCode().value() != 200) {
                 throw new StravaResponseException("Strava activity response failure.");
             }
 
             final List<ActivityResponse> stravaActivities = activityResponse.getBody();
-            if (stravaActivities.isEmpty()) {
+            if (nonNull(stravaActivities) && stravaActivities.isEmpty()) {
                 break;
             }
-            allStravaActivities.add(stravaActivities);
+            if (SportType.ALL == argument.getSportType()) {
+                allStravaActivities.add(stravaActivities);
+            } else {
+                final List<ActivityResponse> filteredActivities = stravaActivities.stream()
+                        .filter(x -> x.getSportType() == argument.getSportType())
+                        .toList();
+                allStravaActivities.add(filteredActivities);
+            }
         }
 
         final AthleteResponse athleteResponseBody = athleteResponse.getBody();
         final List<Activity> activities = activityFactory.getInstance(allStravaActivities, athleteResponseBody);
         final Athlete athlete = athleteFactory.getInstance(athleteResponseBody);//TODO: put this in a separated service
-        customParquetWriter.writeAthlete(athlete, "athlete_schema.avsc", new Path("/Users/hernanrizzuti/Downloads/athlete.parquet"));//TODO: put this in a separated service
-        customParquetWriter.writeActivity(activities, "activity_schema.avsc", new Path(activityDestination));
+        customParquetWriter.writeAthlete(athlete, "athlete_schema.avsc", new Path(String.format("%s/athlete.parquet", activityDestination)));//TODO: put this in a separated service
+        customParquetWriter.writeActivity(activities, "activity_schema.avsc", new Path(String.format("%s/activities.parquet", activityDestination)));
     }
 }

@@ -4,26 +4,30 @@ import com.rizzutih.stravaharvester.client.StravaRestClient;
 import com.rizzutih.stravaharvester.exception.StravaResponseException;
 import com.rizzutih.stravaharvester.factory.ActivityFactory;
 import com.rizzutih.stravaharvester.factory.AthleteFactory;
+import com.rizzutih.stravaharvester.model.Activity;
+import com.rizzutih.stravaharvester.model.Argument;
+import com.rizzutih.stravaharvester.model.Athlete;
 import com.rizzutih.stravaharvester.web.response.strava.ActivityResponse;
 import com.rizzutih.stravaharvester.web.response.strava.AthleteResponse;
+import com.rizzutih.stravaharvester.web.response.strava.SportType;
 import com.rizzutih.stravaharvester.writer.CustomParquetWriter;
 import org.apache.hadoop.fs.Path;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static com.rizzutih.stravaharvester.web.strava.restclient.builders.TestActivityBuilder.testActivityBuilder;
 import static com.rizzutih.stravaharvester.web.strava.restclient.builders.TestActivityResponseBuilder.testActivityResponseBuilder;
+import static com.rizzutih.stravaharvester.web.strava.restclient.builders.TestAthleteBuilder.testAthleteBuilder;
 import static com.rizzutih.stravaharvester.web.strava.restclient.builders.TestAthleteResponseBuilder.testAthleteResponseBuilder;
+import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
@@ -44,19 +48,27 @@ class ActivitiesServiceImplTest {
     @Mock
     private AthleteFactory athleteFactory;
 
-    @Captor
-    private ArgumentCaptor<List<List<ActivityResponse>>> activityResponseCaptor;
-
-    @Captor
-    private ArgumentCaptor<AthleteResponse> athleteResponseCaptor;
-
     private ActivitiesServiceImpl activitiesService;
 
-    private String accessToken = string().next();
+    private final String accessToken = string().next();
+
+    private Argument argument;
+
+    private final String baseDestination = "src/test/resources";
+
+    private final String activityDestination = String.format("%s/%s", baseDestination, "activities.parquet");
+    final String athleteDestination = String.format("%s/%s", baseDestination, "athlete.parquet");
+
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
         activitiesService = new ActivitiesServiceImpl(stravaRestClient, customParquetWriter, activityFactory, athleteFactory);
+        argument = Argument.builder()
+                .harvestedActivityDestination(baseDestination)
+                .activityYears(2)
+                .accessToken(accessToken)
+                .sportType(SportType.RUN)
+                .build();
     }
 
     @Test
@@ -66,28 +78,32 @@ class ActivitiesServiceImplTest {
         final AthleteResponse athleteResponse = testAthleteResponseBuilder().build();
         final ActivityResponse activityResponse = testActivityResponseBuilder().build();
 
-        final String destination = "src/test/resources/activities.parquet";
-        final List<ActivityResponse> activityResponseList = Arrays.asList(activityResponse);
-        final ResponseEntity<List<ActivityResponse>> responseEntity = ResponseEntity.ok(activityResponseList);
+        final Athlete athlete = testAthleteBuilder().build();
+        final Activity activity = testActivityBuilder().build();
+
+        final List<ActivityResponse> activityResponseList = singletonList(activityResponse);
+        final ResponseEntity<List<ActivityResponse>> activityResponseEntity = ResponseEntity.ok(activityResponseList);
+        final ResponseEntity<AthleteResponse> athleteResponseEntity = ResponseEntity.ok(athleteResponse);
 
         //and
-
-        when(stravaRestClient.getAthlete(accessToken)).thenReturn(ResponseEntity.ok(athleteResponse));
+        when(stravaRestClient.getAthlete(accessToken)).thenReturn(athleteResponseEntity);
         when(stravaRestClient.getActivities(eq(accessToken), anyLong(), anyLong(), anyInt(), eq(156)))
-                .thenReturn(responseEntity)
+                .thenReturn(activityResponseEntity)
                 .thenReturn(ResponseEntity.ok(Collections.emptyList()));
 
+        //and
+        when(activityFactory.getInstance(singletonList(activityResponseList), athleteResponse))
+                .thenReturn(singletonList(activity));
+
+
+        when(athleteFactory.getInstance(athleteResponse)).thenReturn(athlete);
+
         //when
-        activitiesService.harvestActivities(accessToken, 2, destination);
+        activitiesService.harvestActivities(argument);
 
         //then
-        verify(athleteFactory).getInstance(athleteResponseCaptor.capture());
-        final AthleteResponse actualAthleteResponse = athleteResponseCaptor.getValue();
-        verify(activityFactory).getInstance(activityResponseCaptor.capture(), any(AthleteResponse.class));
-        final List<List<ActivityResponse>> actualActivityResponseList = activityResponseCaptor.getValue();
-        verify(customParquetWriter).writeActivity(anyList(), eq("activity_schema.avsc"), eq(new Path(destination)));
-        assertEquals(activityResponse, actualActivityResponseList.get(0).get(0));
-        assertEquals(athleteResponse, actualAthleteResponse);
+        verify(customParquetWriter).writeAthlete(any(Athlete.class), eq("athlete_schema.avsc"), eq(new Path(athleteDestination)));
+        verify(customParquetWriter).writeActivity(anyList(), eq("activity_schema.avsc"), eq(new Path(activityDestination)));
     }
 
     @Test
@@ -104,7 +120,7 @@ class ActivitiesServiceImplTest {
 
         //when
         assertThrows(StravaResponseException.class, () -> {
-            activitiesService.harvestActivities(accessToken, 2, destination);
+            activitiesService.harvestActivities(argument);
         });
     }
 
@@ -119,7 +135,7 @@ class ActivitiesServiceImplTest {
 
         //when
         assertThrows(StravaResponseException.class, () -> {
-            activitiesService.harvestActivities(accessToken, 2, destination);
+            activitiesService.harvestActivities(argument);
         });
     }
 }

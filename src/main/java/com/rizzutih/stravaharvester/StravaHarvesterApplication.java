@@ -24,7 +24,6 @@ public class StravaHarvesterApplication implements CommandLineRunner {
         SpringApplication.exit(SpringApplication.run(StravaHarvesterApplication.class, args));
     }
 
-
     @Override
     public void run(String... args) throws Exception {
         final CommandLine commandLine = new CommandLine(argumentProcessor);
@@ -33,7 +32,8 @@ public class StravaHarvesterApplication implements CommandLineRunner {
             throw new IllegalArgumentException("Failed to parse options");
         }
         final Argument argument = commandLine.getExecutionResult();
-        activitiesService.harvestActivities(argument.getAccessToken(), argument.getActivityYears(),
-                argument.getHarvestedActivityDestination());
+        activitiesService.harvestActivities(argument);
+        System.exit(0);
     }
+
 }

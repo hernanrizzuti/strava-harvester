@@ -53,7 +53,8 @@ public enum SportType {
     WHEELCHAIR("Wheelchair"),
     WINDSURF("Windsurf"),
     WORKOUT("Workout"),
-    YOGA("Yoga");
+    YOGA("Yoga"),
+    ALL("All");
 
     private final String value;
 

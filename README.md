@@ -15,14 +15,16 @@ Fetches user activities from Strava and writes them into a parquet file.
     --accessToken=<strava access token> 
     --harvestedActivityDestination=<destination where the parquet will be written> 
     --activityYears=<number of years of activities>'
+    --sportType=<optional: sport type(e.g. Run, Swim, etc). if not provided, all sports will be selected, see link below to list of sportTypes in Strava>
 
-Example:
+- See [SportType Link](https://developers.strava.com/docs/reference/#api-models-SportType)
+
+- See command line example:
     
-    clean bootRun --args='--accessToken=abc --harvestedDestination=/Users/bob/Documents/activities.parquet --activityYears=1'
+    clean bootRun --args='--accessToken=abc --harvestedDestination=/Users/bob/Documents/activities.parquet --activityYears=1 --sportType=Run'
 
 #### Java version
-Java 11 or above
-
+Java 17 or above
 
 #### How can I get the Strava AccessToken?
 - See [Strava documentation](https://developers.strava.com/docs/getting-started/) to create an application in Strava. 

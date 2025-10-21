@@ -1,6 +1,7 @@
 package com.rizzutih.stravaharvester.processor;
 
 import com.rizzutih.stravaharvester.model.Argument;
+import com.rizzutih.stravaharvester.web.response.strava.SportType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import picocli.CommandLine;
@@ -26,10 +27,12 @@ class ArgumentProcessorTest {
         final String accessToken = string().next();
         final String activityYears = integer().next().toString();
         final String harvestedDestination = string().next();
+        final String sportType = "Run";
 
         final String[] args = {format("--accessToken=%s", accessToken),
-                format("--harvestedDestination=%s", harvestedDestination),
-                format("--activityYears=%s", activityYears)
+                format("--harvestedActivityDestination=%s", harvestedDestination),
+                format("--activityYears=%s", activityYears),
+                format("--sportType=%s", sportType)
         };
 
         final int exitCode = commandLine.execute(args);
@@ -37,7 +40,8 @@ class ArgumentProcessorTest {
         assertEquals(0, exitCode);
         assertEquals(accessToken, argument.getAccessToken());
         assertEquals(Integer.parseInt(activityYears), argument.getActivityYears());
-        assertEquals(harvestedDestination, argument.getHarvestedDestination());
+        assertEquals(harvestedDestination, argument.getHarvestedActivityDestination());
+        assertEquals(SportType.valueOf(sportType.toUpperCase()), argument.getSportType());
     }
 
     @Test
